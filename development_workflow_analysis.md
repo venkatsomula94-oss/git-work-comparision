@@ -1,5 +1,3 @@
-
-
 # Development Workflow Analysis
 ## One Long-Lived Branch Per Developer - Multiple PRs Based on User Stories
 
@@ -54,11 +52,78 @@ Main Branch ──→ [Merged PRs in sequence from each developer branch]
 
 ---
 
+## MECHANICAL SCENARIO: MULTIPLE PRs FROM THE SAME BRANCH
+
+This scenario shows exactly what happens when you keep one long-lived branch and open a second PR from it without syncing with `main`.
+
+### Step-by-step timeline
+1. **Story 1 is finished and PR 1 is merged**
+   - Your branch `dev-branch` has **Commit A (Story 1)**.
+   - PR 1 merges Commit A into `main`.
+   - `main` now contains: `[Commit A]`
+2. **Other developers merge their work**
+   - While you prepare Story 2, teammates merge **Commit B** and **Commit C** into `main`.
+   - `main` now contains: `[Commit A] ──► [Commit B] ──► [Commit C]`
+3. **You write Story 2 locally without syncing**
+   - Your local `dev-branch` does not have Commit B or Commit C.
+   - You add **Commit D (Story 2)**.
+   - Your local branch history is: `[Commit A] ──► [Commit D]`
+4. **You push and open PR 2 targeting `main`**
+   - Git compares the branch tips:
+     - `main`: `[Commit A] ──► [Commit B] ──► [Commit C]`
+     - `dev-branch`: `[Commit A] ──► [Commit D]`
+   - Git must merge the branch tip `[A ──► D]` into `main` ending at Commit C.
+
+### What actually happens to PR 2
+- **Out-of-sync merge conflict**
+  - Your branch is missing Commit B and Commit C.
+  - If Commit D changes any files or lines touched by B or C, Git will likely produce a merge conflict.
+- **Broken CI/CD assumptions**
+  - The PR tests `A + D`, not `A + B + C + D`.
+  - If Commit D depends on or conflicts with changes in B or C, the build may fail after merge.
+- **Cumulative PR baggage**
+  - PR 2 still shows Commit A in its history.
+  - This makes it impossible to isolate Story 2 cleanly from Story 1.
+
+### The core misunderstanding
+Git does not treat a branch like a folder. Git tracks a sequential commit history.
+Because other developers inserted B and C while you were working, your local timeline `[A ──► D]` is now out of sync with `main`'s timeline `[A ──► B ──► C]`.
+
+### Safe alternative
+The safest workflow is:
+- Finish Story 1 on `branch-story-1` and raise PR 1.
+- After PR 1 is merged, create a new branch from `main` for Story 2: `git checkout -b branch-story-2`.
+- Work on Story 2 and raise PR 2 from the new branch.
+
+This keeps each PR isolated, prevents ghost code from leaking between PRs, and avoids the "same branch tip but different history" problem.
+
+### Why multiple PRs from the same branch is risky
+- A PR targets a branch tip, not individual files.
+- If you use the same branch for Story 1 and Story 2, both PRs contain the same commit history.
+- You cannot easily isolate Story 2 from Story 1 unless you use cherry-picks or temporary submission branches.
+
+### Better approaches
+- **Approach 1: One story = one branch = one PR**
+  - Industry standard.
+  - Complete isolation and clean review history.
+- **Approach 2: Sequential feature branching**
+  - Branch Story 2 from Story 1 if Story 2 depends on Story 1.
+  - PR 2 targets the branch for Story 1, not `main`.
+- **Approach 3: Cherry-pick separation**
+  - Keep your local developer branch for work.
+  - Create clean submission branches for each story and cherry-pick the relevant commits.
+
+### Recommended fix for this team
+Strongly push for the one story/one branch model.
+If the team cannot do that, the next best option is to use temporary submission branches and cherry-pick specific commits for each PR rather than pushing from the same branch directly.
+
+---
+
 ## PROS (Advantages)
 
 | # | Advantage | Impact | Ease | Notes |
 |---|-----------|--------|------|-------|
-| 1 | **Simple branching model** | ⭐⭐⭐⭐⭐ | Very Easy | One branch = one dev = one story = one PR |
+| 1 | **Simple branching model** | ⭐⭐⭐⭐⭐ | Very Easy | One branch = one dev, multiple story PRs |
 | 2 | **Clear ownership** | ⭐⭐⭐⭐⭐ | Easy | Each story has single owner |
 | 3 | **Atomic user stories** | ⭐⭐⭐⭐⭐ | Easy | PR = completed feature |
 | 4 | **Easy to understand** | ⭐⭐⭐⭐⭐ | Very Easy | New devs grasp model immediately |
