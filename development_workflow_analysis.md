@@ -1,6 +1,6 @@
 # Development Workflow Analysis
 
- One Long-Lived Branch Per Developer - Multiple PRs Based on User Stories
+ One Long-Lived Branch Per Developer
 
 ---
 
