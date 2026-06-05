@@ -16,16 +16,36 @@
 
 ---
 
-## WORKFLOW OVERVIEW
+## BRANCHING STRATEGY OVERVIEW
+
+This document focuses on strategy for one branch per developer, where each developer creates a branch for their assigned user story and raises PRs from that branch.
+
+**Key branching rules:**
+- Branch name should follow: `feature/{story-id}-{short-description}`
+- Each branch is tied to a single user story
+- PRs are created from story branches and merged into `main` after review
+- DB/DS changes should use dedicated feature branches when needed, but still follow the same one-branch-per-dev strategy
 
 ```
-Developer A ──→ feature-branch-a ──→ PR for Story 1 ──→ Code Review ──→ Merge
-Developer B ──→ feature-branch-b ──→ PR for Story 2 ──→ Code Review ──→ Merge
-Developer C ──→ feature-branch-c ──→ PR for Story 3 ──→ Code Review ──→ Merge
-Developer D ──→ feature-branch-d ──→ PR for Story 4 ──→ Code Review ──→ Merge
+Developer A ──→ feature/USER-001-login ──→ PR for Story 1 ──→ Code Review ──→ Merge
+Developer B ──→ feature/USER-002-password ──→ PR for Story 2 ──→ Code Review ──→ Merge
+Developer C ──→ feature/USER-003-profile ──→ PR for Story 3 ──→ Code Review ──→ Merge
+Developer D ──→ feature/DB-001-user-role ──→ PR for Story 4 ──→ Code Review ──→ Merge
 
 Main Branch ──→ [Merged PRs in sequence]
 ```
+
+---
+
+## BRANCH NAMING & STRATEGY
+
+| Rule | Purpose | Example |
+|------|---------|---------|
+| `feature/{story-id}-{description}` | Consistent branch names | `feature/USER-001-login` |
+| Single story per branch | Isolate work and simplify review | One story = one PR |
+| Keep branches short-lived | Avoid divergence from `main` | Merge within 3-5 days |
+| Rebase or merge `main` frequently | Keep branch up to date | Daily sync with `main` |
+| Use draft PRs for early feedback | Share in-progress work safely | Draft PR for review before completion |
 
 ---
 
