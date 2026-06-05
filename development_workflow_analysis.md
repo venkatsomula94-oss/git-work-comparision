@@ -84,6 +84,16 @@ This scenario shows exactly what happens when you keep one long-lived branch and
 - **Cumulative PR baggage**
   - PR 2 still shows Commit A in its history.
   - This makes it impossible to isolate Story 2 cleanly from Story 1.
+  - ### What actually happens to PR 2
+- **Out-of-sync merge conflict**
+  - Your branch is missing Commit B and Commit C.
+  - If Commit D changes any files or lines touched by B or C, Git will likely produce a merge conflict.
+- **Broken CI/CD assumptions**
+  - The PR tests `A + D`, not `A + B + C + D`.
+  - If Commit D depends on or conflicts with changes in B or C, the build may fail after merge.
+- **Cumulative PR baggage**
+  - PR 2 still shows Commit A in its history.
+  - This makes it impossible to isolate Story 2 cleanly from Story 1.
 
 ### The core misunderstanding
 Git does not treat a branch like a folder. Git tracks a sequential commit history.
