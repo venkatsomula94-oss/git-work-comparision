@@ -1,5 +1,7 @@
+
+
 # Development Workflow Analysis
-## One Branch Per Developer - PRs Based on User Stories
+## One Long-Lived Branch Per Developer - Multiple PRs Based on User Stories
 
 ---
 
@@ -7,32 +9,34 @@
 
 | Aspect | Rating | Notes |
 |--------|--------|-------|
-| **Best For** | Small to Medium Teams (< 12 devs) | ✅ Optimal |
-| **Scalability** | Medium to High | ✅ Better than multi-branch approach |
-| **Complexity** | Very Low | ✅ Simplest model |
-| **Review Culture Required** | Medium | Important for quality |
-| **Recommendation** | ✓ **HIGHLY RECOMMENDED** | Best practice for most teams |
-| **Implementation Effort** | Very Low | Minimal transition |
+| **Best For** | Small to Medium Teams (< 12 devs) | ✅ Good fit for stable ownership |
+| **Scalability** | Medium | ⚠️ Works if strong discipline exists |
+| **Complexity** | Medium | ⚠️ Requires branch hygiene |
+| **Review Culture Required** | High | Essential for quality |
+| **Recommendation** | ✓ **RECOMMENDED WITH GUARDS** | Use when developers own longer-running branches |
+| **Implementation Effort** | Medium | Needs clear process and tooling |
 
 ---
 
 ## BRANCHING STRATEGY OVERVIEW
 
-This document focuses on strategy for one branch per developer, where each developer creates a branch for their assigned user story and raises PRs from that branch.
+This document focuses on strategy for one long-lived branch per developer, where each developer keeps a personal branch and raises multiple PRs from it for assigned user stories.
 
 **Key branching rules:**
-- Branch name should follow: `feature/{story-id}-{short-description}`
-- Each branch is tied to a single user story
-- PRs are created from story branches and merged into `main` after review
-- DB/DS changes should use dedicated feature branches when needed, but still follow the same one-branch-per-dev strategy
+- Branch name should follow: `dev/{name}` or `feature/{dev-name}`
+- One developer maintains the branch across multiple stories within a sprint
+- Create one PR per user story from the same branch
+- Keep branch up to date with `main` frequently
+- Use draft PRs for early feedback and story separation
+- DB/DS work may still require dedicated feature branches for schema or model changes, but follow the same branch ownership principle
 
 ```
-Developer A ──→ feature/USER-001-login ──→ PR for Story 1 ──→ Code Review ──→ Merge
-Developer B ──→ feature/USER-002-password ──→ PR for Story 2 ──→ Code Review ──→ Merge
-Developer C ──→ feature/USER-003-profile ──→ PR for Story 3 ──→ Code Review ──→ Merge
-Developer D ──→ feature/DB-001-user-role ──→ PR for Story 4 ──→ Code Review ──→ Merge
+Developer A ──→ dev/alice ──→ PR for Story 1 ──→ Code Review ──→ Merge
+                └─→ PR for Story 2 ──→ Code Review ──→ Merge
+Developer B ──→ dev/bob ──→ PR for Story 3 ──→ Code Review ──→ Merge
+                └─→ PR for Story 4 ──→ Code Review ──→ Merge
 
-Main Branch ──→ [Merged PRs in sequence]
+Main Branch ──→ [Merged PRs in sequence from each developer branch]
 ```
 
 ---
@@ -41,11 +45,12 @@ Main Branch ──→ [Merged PRs in sequence]
 
 | Rule | Purpose | Example |
 |------|---------|---------|
-| `feature/{story-id}-{description}` | Consistent branch names | `feature/USER-001-login` |
-| Single story per branch | Isolate work and simplify review | One story = one PR |
-| Keep branches short-lived | Avoid divergence from `main` | Merge within 3-5 days |
-| Rebase or merge `main` frequently | Keep branch up to date | Daily sync with `main` |
-| Use draft PRs for early feedback | Share in-progress work safely | Draft PR for review before completion |
+| `dev/{name}` or `feature/{dev-name}` | Consistent long-lived branch names | `dev/alice` |
+| One branch per developer | Maintain ownership and reduce branch count | One branch = one developer |
+| One PR per story | Keep PR scope small even on same branch | PR for Story 1, PR for Story 2 |
+| Sync with `main` frequently | Avoid large merge conflicts | Daily or every few days |
+| Use draft PRs for in-progress work | Share partial progress without final merge | Draft PR for early review |
+| Tag PRs with story IDs | Keep history traceable | `USER-001`, `USER-002` |
 
 ---
 
